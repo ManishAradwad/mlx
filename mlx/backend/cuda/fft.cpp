@@ -44,23 +44,14 @@ void check_cufft_error(const char* name, cufftResult err) {
       case CUFFT_UNALIGNED_DATA:
         err_msg = "CUFFT_UNALIGNED_DATA";
         break;
-      case CUFFT_INCOMPLETE_PARAMETER_LIST:
-        err_msg = "CUFFT_INCOMPLETE_PARAMETER_LIST";
-        break;
       case CUFFT_INVALID_DEVICE:
         err_msg = "CUFFT_INVALID_DEVICE";
-        break;
-      case CUFFT_PARSE_ERROR:
-        err_msg = "CUFFT_PARSE_ERROR";
         break;
       case CUFFT_NO_WORKSPACE:
         err_msg = "CUFFT_NO_WORKSPACE";
         break;
       case CUFFT_NOT_IMPLEMENTED:
         err_msg = "CUFFT_NOT_IMPLEMENTED";
-        break;
-      case CUFFT_LICENSE_ERROR:
-        err_msg = "CUFFT_LICENSE_ERROR";
         break;
       case CUFFT_NOT_SUPPORTED:
         err_msg = "CUFFT_NOT_SUPPORTED";
@@ -119,7 +110,7 @@ void FFT::eval_gpu(const std::vector<array>& inputs, array& out) {
     int direction = inverse_ ? CUFFT_INVERSE : CUFFT_FORWARD;
     result = cufftExecC2C(
         plan,
-        reinterpret_cast<cufftComplex*>(in.data<complex64_t>()),
+        const_cast<cufftComplex*>(reinterpret_cast<const cufftComplex*>(in.data<complex64_t>())),
         reinterpret_cast<cufftComplex*>(out.data<complex64_t>()),
         direction);
     CHECK_CUFFT_ERROR(result);
@@ -150,7 +141,7 @@ void FFT::eval_gpu(const std::vector<array>& inputs, array& out) {
     // Execute C2R FFT
     result = cufftExecC2R(
         plan,
-        reinterpret_cast<cufftComplex*>(in.data<complex64_t>()),
+        const_cast<cufftComplex*>(reinterpret_cast<const cufftComplex*>(in.data<complex64_t>())),
         out.data<float>());
     CHECK_CUFFT_ERROR(result);
     
